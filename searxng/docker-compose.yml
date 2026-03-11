@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  valkey:
+    image: valkey/valkey:unstable-alpine
+    container_name: searxng-valkey
+    restart: unless-stopped
+    networks:
+      - searxng-net
+
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    restart: unless-stopped
+    environment:
+      - SEARXNG_PORT=8080
+      - SEARXNG_BIND_ADDRESS=0.0.0.0
+      - SEARXNG_BASE_URL=http://localhost:8080/
+      - SEARXNG_SECRET=${SEARXNG_SECRET}
+    volumes:
+      - searxng-data:/var/cache/searxng
+      - ./searxng:/etc/searxng
+    ports:
+      - "8080:8080"
+    depends_on:
+      - valkey
+    networks:
+      - searxng-net
+
+networks:
+  searxng-net:
+
+volumes:
+  searxng-data:
