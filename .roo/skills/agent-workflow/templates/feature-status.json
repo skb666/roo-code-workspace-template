@@ -1,0 +1,46 @@
+{
+  "project": "项目名称",
+  "version": "1.0.0",
+  "last_updated": "2026-03-12T00:00:00Z",
+  "summary": {
+    "total": 0,
+    "completed": 0,
+    "in_progress": 0,
+    "pending": 0,
+    "blocked": 0
+  },
+  "features": [
+    {
+      "id": "F001",
+      "priority": "high",
+      "category": "core",
+      "description": "功能描述",
+      "details": "详细说明",
+      "steps": [
+        "验证步骤1",
+        "验证步骤2",
+        "验证步骤3"
+      ],
+      "passes": false,
+      "verified_by": null,
+      "verified_at": null,
+      "notes": "",
+      "dependencies": [],
+      "blocked_by": null
+    }
+  ],
+  "categories": {
+    "core": "核心功能",
+    "api": "API 相关",
+    "ui": "用户界面",
+    "auth": "认证授权",
+    "data": "数据处理",
+    "infra": "基础设施"
+  },
+  "priorities": {
+    "critical": "必须完成，阻塞其他功能",
+    "high": "重要功能",
+    "medium": "常规功能",
+    "low": "可选功能"
+  }
+}
