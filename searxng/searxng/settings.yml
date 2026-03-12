@@ -76,6 +76,7 @@ search:
   # formats: [html, csv, json, rss]
   formats:
     - html
+    - json
 
 server:
   # Is overwritten by ${SEARXNG_PORT} and ${SEARXNG_BIND_ADDRESS}
@@ -295,12 +296,12 @@ engines:
     engine: 360search
     shortcut: 360so
     timeout: 10.0
-    disabled: true
+    disabled: false
 
   - name: 360search videos
     engine: 360search_videos
     shortcut: 360sov
-    disabled: true
+    disabled: false
 
   - name: 9gag
     engine: 9gag
@@ -469,21 +470,21 @@ engines:
     categories: [general]
     engine: baidu
     shortcut: bd
-    disabled: true
+    disabled: false
 
   - name: baidu images
     baidu_category: images
     categories: [images]
     engine: baidu
     shortcut: bdi
-    disabled: true
+    disabled: false
 
   - name: baidu kaifa
     baidu_category: it
     categories: [it]
     engine: baidu
     shortcut: bdk
-    disabled: true
+    disabled: false
 
   - name: wikipedia
     engine: wikipedia
@@ -495,12 +496,12 @@ engines:
   - name: bilibili
     engine: bilibili
     shortcut: bil
-    disabled: true
+    disabled: false
 
   - name: bing
     engine: bing
     shortcut: bi
-    disabled: true
+    disabled: false
 
   - name: bing images
     engine: bing_images
@@ -1717,14 +1718,14 @@ engines:
     categories: [general]
     engine: quark
     shortcut: qk
-    disabled: true
+    disabled: false
 
   - name: quark images
     quark_category: images
     categories: [images]
     engine: quark
     shortcut: qki
-    disabled: true
+    disabled: false
 
   - name: qwant
     qwant_categ: web
@@ -1858,22 +1859,22 @@ engines:
   - name: sogou
     engine: sogou
     shortcut: sogou
-    disabled: true
+    disabled: false
 
   - name: sogou images
     engine: sogou_images
     shortcut: sogoui
-    disabled: true
+    disabled: false
 
   - name: sogou videos
     engine: sogou_videos
     shortcut: sogouv
-    disabled: true
+    disabled: false
 
   - name: sogou wechat
     engine: sogou_wechat
     shortcut: sogouw
-    disabled: true
+    disabled: false
 
   - name: soundcloud
     engine: soundcloud
