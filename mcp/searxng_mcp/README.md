@@ -25,21 +25,40 @@
 
 ## 安装步骤
 
-### 1. 安装 MCP 依赖
+### 0. 设置 Python 虚拟环境（推荐）
+
+为避免破坏系统 Python 环境，建议使用虚拟环境：
 
 ```bash
-pip3 install mcp
+# 创建虚拟环境（使用 .venv 目录名）
+python3 -m venv .venv
+# 或者安装 uv（如果未安装）
+# curl -LsSf https://astral.sh/uv/install.sh | sh
+# uv venv
+
+# 激活虚拟环境
+source .venv/bin/activate  # Linux/macOS
+# .venv\Scripts\activate   # Windows
+```
+
+### 1. 安装 MCP 依赖
+
+确保虚拟环境已激活，然后安装依赖：
+
+```bash
+pip install mcp
+# uv pip install mcp
 ```
 
 ### 2. 在 Roo Code 中配置 MCP
 
-在 Roo Code 设置中添加 MCP 服务器配置：
+项目已预配置 MCP 服务器设置。配置文件 `mcp/searxng_mcp/mcp_config.json` 使用虚拟环境中的 Python 解释器：
 
 ```json
 {
   "mcpServers": {
     "searxng-search": {
-      "command": "python3",
+      "command": "${workspaceFolder}/.venv/bin/python",
       "args": ["${workspaceFolder}/mcp/searxng_mcp/mcp_server.py"],
       "env": {
         "SEARXNG_BASE_URL": "http://localhost:8080"
@@ -48,6 +67,8 @@ pip3 install mcp
   }
 }
 ```
+
+如果你使用系统 Python，可以相应修改 `command` 字段。
 
 ### 3. 确保 SearXNG 运行
 
@@ -88,9 +109,10 @@ MCP 服务器提供以下搜索工具：
 ## 故障排除
 
 ### MCP 连接失败
-1. 检查 Python 环境是否安装 `mcp` 包
-2. 检查文件路径是否正确
-3. 查看 Roo Code 日志
+1. 确保虚拟环境已激活，并检查是否安装了 `mcp` 包
+2. 检查 MCP 配置文件 `mcp/searxng_mcp/mcp_config.json` 中的 Python 路径是否正确指向虚拟环境（`${workspaceFolder}/.venv/bin/python`）
+3. 检查文件路径是否正确
+4. 查看 Roo Code 日志
 
 ### 搜索无结果
 1. 确认 SearXNG 正在运行

@@ -6,6 +6,7 @@ SearXNG MCP Server - 为 Roo Code 提供联网搜索能力
 
 import asyncio
 import json
+import os
 import sys
 import urllib.parse
 import urllib.request
@@ -24,7 +25,7 @@ except ImportError:
     sys.exit(1)
 
 # SearXNG 配置
-SEARXNG_BASE_URL = "http://localhost:8080"
+SEARXNG_BASE_URL = os.environ.get("SEARXNG_BASE_URL", "http://localhost:8080")
 DEFAULT_FORMAT = "json"
 
 # 已启用的搜索引擎 (根据 settings.yml 配置)

@@ -1,7 +1,7 @@
 {
 	"mcpServers": {
 		"searxng-search": {
-			"command": "python3",
+			"command": "${workspaceFolder}/.venv/bin/python",
 			"args": [
 				"${workspaceFolder}/mcp/searxng_mcp/mcp_server.py"
 			],

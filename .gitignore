@@ -75,6 +75,10 @@ htmlcov/
 .ipynb_checkpoints
 
 # 虚拟环境
+.venv/
 venv/
 ENV/
 env/
+
+# uv 锁文件
+uv.lock

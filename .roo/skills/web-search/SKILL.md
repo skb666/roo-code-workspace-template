@@ -256,9 +256,37 @@ Python (error OR exception) -stackoverflow
 
 确保 MCP 服务器已正确配置：
 - SearXNG 地址：`http://localhost:8080`
-- Python 环境：需要安装 `mcp` 包
+- Python 环境：使用虚拟环境（避免破坏系统依赖）
 
-安装依赖：
+### 设置虚拟环境
+
 ```bash
-pip install mcp
+# 创建虚拟环境（使用 .venv 目录名）
+python3 -m venv .venv
+# 或者安装 uv（如果未安装）
+# curl -LsSf https://astral.sh/uv/install.sh | sh
+# uv venv
+
+# 激活虚拟环境
+source .venv/bin/activate  # Linux/macOS
+# .venv\Scripts\activate   # Windows
+```
+
+> **注意**：在 Ubuntu 等系统中，直接使用全局 `pip install` 可能破坏系统依赖，建议始终使用虚拟环境。
+
+### 配置 MCP 服务器
+
+配置文件中的 Python 路径统一为：
+```json
+{
+  "mcpServers": {
+    "searxng-search": {
+      "command": "${workspaceFolder}/.venv/bin/python",
+      "args": ["${workspaceFolder}/mcp/searxng_mcp/mcp_server.py"],
+      "env": {
+        "SEARXNG_BASE_URL": "http://localhost:8080"
+      }
+    }
+  }
+}
 ```

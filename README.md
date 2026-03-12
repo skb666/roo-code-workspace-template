@@ -130,10 +130,44 @@ MCP 服务器为 AI 助手提供实时网络搜索能力：
 
 ### MCP 连接问题
 1. 确保已安装 Python 3.8+
-2. 安装 MCP 依赖：
+2. **设置 Python 虚拟环境（推荐）**：
+   
+   为避免破坏 Ubuntu 系统依赖，建议使用虚拟环境隔离 Python 包。提供两种方法：
+   
+   **方法一：使用 venv（Python 内置）**
    ```bash
-   pip3 install mcp
+   # 创建虚拟环境（使用 .venv 目录名）
+   python3 -m venv .venv
+   
+   # 激活虚拟环境
+   source .venv/bin/activate  # Linux/macOS
+   # .venv\Scripts\activate   # Windows
+   
+   # 安装依赖
+   pip install mcp
    ```
+   
+   **方法二：使用 uv（推荐，更快）**
+   ```bash
+   # 安装 uv（如果未安装）
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   
+   # 创建虚拟环境（默认使用 .venv 目录名）
+   uv venv
+   
+   # 安装依赖
+   uv pip install mcp
+   ```
+   
+   **两种方法对比**：
+   | 特性 | venv | uv |
+   |------|------|-----|
+   | 安装 | Python 内置，无需额外安装 | 需要安装 uv |
+   | 速度 | 较慢 | 快（Rust 实现）|
+   | 包管理 | pip | uv pip |
+   | 锁文件 | 不支持 | 支持 uv.lock |
+   | 推荐场景 | 简单项目、无额外依赖 | 现代项目、需要快速安装 |
+   
 3. 验证 SearXNG 是否运行：
    ```bash
    docker ps | grep searxng
