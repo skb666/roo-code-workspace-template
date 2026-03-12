@@ -1,0 +1,15 @@
+[project]
+name = "searxng-mcp"
+version = "1.0.0"
+description = "SearXNG MCP Server for Roo Code"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.0.0",
+]
+
+[project.scripts]
+searxng-mcp = "mcp_server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "searxng-search": {
+      "command": "python3",
+      "args": ["${workspaceFolder}/mcp/searxng_mcp/mcp_server.py"],
+      "env": {
+        "SEARXNG_BASE_URL": "http://localhost:8080"
+      }
+    }
+  }
+}

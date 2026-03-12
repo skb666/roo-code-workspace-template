@@ -1,0 +1,21 @@
+{
+	"mcpServers": {
+		"searxng-search": {
+			"command": "python3",
+			"args": [
+				"${workspaceFolder}/mcp/searxng_mcp/mcp_server.py"
+			],
+			"env": {
+				"SEARXNG_BASE_URL": "http://localhost:8080"
+			},
+			"alwaysAllow": [
+				"web_search",
+				"news_search",
+				"image_search",
+				"code_search",
+				"academic_search",
+				"wechat_search"
+			]
+		}
+	}
+}
