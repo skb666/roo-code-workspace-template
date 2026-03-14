@@ -1,0 +1,80 @@
+# AI Agent 工具集 - Docker Compose 配置
+# 包含: SearXNG (搜索引擎) + SearXNG MCP (搜索) + Web Reader MCP (阅读)
+
+version: "3.8"
+
+services:
+  # ==================== SearXNG 搜索引擎 ====================
+  valkey:
+    image: valkey/valkey:unstable-alpine
+    container_name: searxng-valkey
+    restart: unless-stopped
+    networks:
+      - agent-net
+
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    restart: unless-stopped
+    environment:
+      - SEARXNG_PORT=8080
+      - SEARXNG_BIND_ADDRESS=0.0.0.0
+      - SEARXNG_BASE_URL=http://localhost:8080/
+      - SEARXNG_SECRET=${SEARXNG_SECRET}
+    volumes:
+      - searxng-data:/var/cache/searxng
+      - ./searxng:/etc/searxng
+    ports:
+      - "8080:8080"
+    depends_on:
+      - valkey
+    networks:
+      - agent-net
+
+  # ==================== MCP 服务器 ====================
+  searxng-mcp:
+    build:
+      context: ./mcp/searxng_mcp
+      dockerfile: Dockerfile
+    image: searxng-mcp:latest
+    container_name: searxng-mcp
+    restart: unless-stopped
+    environment:
+      - SEARXNG_BASE_URL=http://searxng:8080
+    networks:
+      - agent-net
+    # MCP 服务器通过 stdin/stdout 通信
+
+  web-reader-mcp:
+    build:
+      context: ./mcp/web_reader_mcp
+      dockerfile: Dockerfile
+    image: web-reader-mcp:latest
+    container_name: web-reader-mcp
+    restart: unless-stopped
+    environment:
+      - WEB_READER_TIMEOUT=30
+      - WEB_READER_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+    networks:
+      - agent-net
+    # MCP 服务器通过 stdin/stdout 通信
+
+  # ==================== 向量数据库 ====================
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant-storage:/qdrant/storage
+    networks:
+      - agent-net
+
+networks:
+  agent-net:
+    driver: bridge
+
+volumes:
+  searxng-data:
+  qdrant-storage:
