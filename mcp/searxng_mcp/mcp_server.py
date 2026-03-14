@@ -28,12 +28,12 @@ except ImportError:
 SEARXNG_BASE_URL = os.environ.get("SEARXNG_BASE_URL", "http://localhost:8080")
 DEFAULT_FORMAT = "json"
 
-# 已启用的搜索引擎 (根据 settings.yml 配置)
-ENGINES_GENERAL = ["bing", "baidu", "360search", "sogou", "quark", "wikipedia"]
-ENGINES_IMAGES = ["bing_images", "baidu_images", "sogou_images", "quark_images"]
-ENGINES_NEWS = ["bing_news", "qwant"]
-ENGINES_CODE = ["bing", "baidu", "github", "stackoverflow"]  # baidu_kaifa 在 IT 分类
-ENGINES_ACADEMIC = ["bing", "arxiv", "pubmed"]
+# 已启用的搜索引擎 (根据实际测试结果配置)
+# 注意：引擎名称中的空格是必需的，不要使用下划线
+# 某些引擎需要通过 categories 参数调用，而不是直接指定 engines
+ENGINES_GENERAL = ["bing", "baidu", "360search", "sogou"]  # 移除了 quark, wikipedia (无结果)
+ENGINES_IMAGES = ["bing images", "baidu images", "sogou images", "quark images"]  # quark images 可用
+# 新闻、代码、学术搜索使用 categories 而不是 engines，因为单独指定引擎会超时或无结果
 
 # 创建 MCP 服务器实例
 server = Server("searxng-search")
@@ -177,7 +177,7 @@ async def list_tools() -> list[Tool]:
                     },
                     "engines": {
                         "type": "string",
-                        "description": "指定搜索引擎，逗号分隔 (默认: bing,baidu,360search,sogou,quark,wikipedia)",
+                        "description": "指定搜索引擎，逗号分隔 (默认: bing,baidu,360search,sogou)。注意：引擎名称包含空格，如 'bing images'",
                     },
                     "categories": {
                         "type": "string",
@@ -254,8 +254,8 @@ async def list_tools() -> list[Tool]:
                     },
                     "engines": {
                         "type": "string",
-                        "description": "图片搜索引擎 (默认: bing_images,baidu_images,sogou_images,quark_images)",
-                        "default": "bing_images,baidu_images,sogou_images,quark_images",
+                        "description": "图片搜索引擎 (默认: bing images,baidu images,sogou images,quark images)",
+                        "default": "bing images,baidu images,sogou images,quark images",
                     },
                     "max_results": {
                         "type": "integer",
@@ -302,18 +302,15 @@ async def list_tools() -> list[Tool]:
 适用于:
 - 学术论文查找
 - 研究资料收集
-- 引用文献检索""",
+- 引用文献检索
+
+注意: 使用 science 分类进行搜索，涵盖多个学术搜索引擎""",
             inputSchema={
                 "type": "object",
                 "properties": {
                     "query": {
                         "type": "string",
                         "description": "学术搜索关键词",
-                    },
-                    "engines": {
-                        "type": "string",
-                        "description": "学术搜索引擎 (默认: bing,arxiv,pubmed)",
-                        "default": "bing,arxiv,pubmed",
                     },
                     "max_results": {
                         "type": "integer",
@@ -367,11 +364,22 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
         return [TextContent(type="text", text=formatted)]
     
     elif name == "news_search":
+        # 不使用 categories="news"，因为它会调用不可用的新闻引擎
+        # 改用通用搜索引擎 + 新闻关键词 + 时间范围
+        query = arguments.get("query")
+        time_range = arguments.get("time_range", "day")
+        
+        # 如果查询中不包含新闻相关词汇，添加提示
+        news_keywords = ["新闻", "news", "资讯", "热点", "头条", "报道"]
+        has_news_keyword = any(kw in query.lower() for kw in news_keywords)
+        if not has_news_keyword:
+            query = f"{query} 新闻"
+        
         results = search_searxng(
-            query=arguments.get("query"),
-            categories="news",
+            query=query,
+            engines="baidu,bing,sogou,360search",  # 使用中国可用的搜索引擎
             language=arguments.get("language", "zh-CN"),
-            time_range=arguments.get("time_range", "week"),
+            time_range=time_range,
         )
         formatted = format_search_results(results, arguments.get("max_results", 10))
         return [TextContent(type="text", text=formatted)]
@@ -379,7 +387,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
     elif name == "image_search":
         results = search_searxng(
             query=arguments.get("query"),
-            engines=arguments.get("engines", "bing_images,baidu_images,sogou_images,quark_images"),
+            engines=arguments.get("engines", "bing images,baidu images,sogou images,quark images"),
             categories="images",
         )
         formatted = format_search_results(results, arguments.get("max_results", 10))
@@ -391,11 +399,10 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
         if language := arguments.get("language"):
             query = f"{query} {language} programming"
         
-        # 使用 IT 分类或特定引擎
+        # 使用 IT 分类，不指定 engines 以避免冲突
         results = search_searxng(
             query=query,
             categories="it",
-            engines=arguments.get("engines", "bing,baidu,github,stackoverflow"),
         )
         formatted = format_search_results(results, arguments.get("max_results", 10))
         return [TextContent(type="text", text=formatted)]
@@ -403,7 +410,6 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
     elif name == "academic_search":
         results = search_searxng(
             query=arguments.get("query"),
-            engines=arguments.get("engines", "bing,arxiv,pubmed"),
             categories="science",
         )
         formatted = format_search_results(results, arguments.get("max_results", 10))
@@ -412,7 +418,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
     elif name == "wechat_search":
         results = search_searxng(
             query=arguments.get("query"),
-            engines="sogou_wechat",
+            engines="sogou wechat",
             language="zh-CN",
         )
         formatted = format_search_results(results, arguments.get("max_results", 10))
